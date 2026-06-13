@@ -258,30 +258,18 @@ export const setupCollabSocket = (io: Server) => {
       }
     });
 
-    // Typing indicator
-    socket.on("collab:typing", async ({ roomId }) => {
-      try {
-        const userId = socket.data.userId;
-        const username = socket.data.username;
-        const room = await CollabRoom.findOne({ roomId });
-        if (!room) return;
-        if (!room.participants.some((p) => p.userId === userId)) return;
-        socket.to(roomId).emit("collab:user_typing", { userId, username });
-      } catch (error) {
-        logger.error("collab:typing event error", error);
-      }
+    // Typing indicator — broadcast to other participants in the room
+    socket.on("collab:typing", ({ roomId }: { roomId: string }) => {
+      if (!roomId || !socket.rooms.has(roomId)) return;
+      const userId = socket.data.userId;
+      const username = socket.data.username;
+      socket.to(roomId).emit("collab:user_typing", { userId, username });
     });
 
-    socket.on("collab:stop_typing", async ({ roomId }) => {
-      try {
-        const userId = socket.data.userId;
-        const room = await CollabRoom.findOne({ roomId });
-        if (!room) return;
-        if (!room.participants.some((p) => p.userId === userId)) return;
-        socket.to(roomId).emit("collab:user_stop_typing", { userId });
-      } catch (error) {
-        logger.error("collab:stop_typing event error", error);
-      }
+    socket.on("collab:stop_typing", ({ roomId }: { roomId: string }) => {
+      if (!roomId || !socket.rooms.has(roomId)) return;
+      const userId = socket.data.userId;
+      socket.to(roomId).emit("collab:user_stop_typing", { userId });
     });
 
     // Get room info
@@ -309,8 +297,10 @@ export const setupCollabSocket = (io: Server) => {
     // Disconnect
     socket.on("disconnect", async () => {
       try {
+        const userId = socket.data.userId;
         const rooms = await CollabRoom.find({ "participants.socketId": socket.id });
         for (const room of rooms) {
+          collabNamespace.to(room.roomId).emit("collab:user_stop_typing", { userId });
           room.participants = room.participants.filter(
             (p) => p.socketId !== socket.id,
           );
