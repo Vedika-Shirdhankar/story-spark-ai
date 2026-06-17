@@ -95,6 +95,7 @@ export default function StoryWorldMap({ story, title, onClose }: Props) {
       .call(
         d3.drag<SVGGElement, SimNode>()
           .on("start", (event: d3.D3DragEvent<SVGGElement, SimNode, SimNode>, d: SimNode) => {
+          .on("start", (event: d3.D3DragEvent<SVGGElement, SimNode, SimNode>, node: SimNode) => {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
             d.fy = d.y;
@@ -103,6 +104,11 @@ export default function StoryWorldMap({ story, title, onClose }: Props) {
             d.fx = event.x; d.fy = event.y;
           })
           .on("end", (event: d3.D3DragEvent<SVGGElement, SimNode, SimNode>, d: SimNode) => {
+          .on("drag", (event: d3.D3DragEvent<SVGGElement, SimNode, SimNode>, node: SimNode) => {
+            node.fx = event.x;
+            node.fy = event.y;
+          })
+          .on("end", (event: d3.D3DragEvent<SVGGElement, SimNode, SimNode>, node: SimNode) => {
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;

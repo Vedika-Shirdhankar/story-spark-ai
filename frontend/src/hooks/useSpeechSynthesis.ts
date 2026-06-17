@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type WordRange = {
   start: number;
@@ -418,6 +418,10 @@ export const useSpeechSynthesis = (text: string): UseSpeechSynthesisResult => {
       .split(/\s+/)
       .slice(resumeFromWord)
       .join(" ");
+      utterance.onboundary = (event) => {
+        if (event.name !== "word") {
+          return;
+        }
 
     if (!remainingText.trim()) return;
 
@@ -436,6 +440,16 @@ export const useSpeechSynthesis = (text: string): UseSpeechSynthesisResult => {
         currentWordIndexRef.current = resumeFromWord + localIndex;
       }
     };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setIsPaused(false);
+        setError("Unable to play narration. Please try again.");
+      };
+
+      const loadedVoices = speechSynthesis.getVoices();
+      browserVoicesRef.current = loadedVoices;
+      setBrowserVoices(loadedVoices);
+      setIsReady(loadedVoices.length > 0);
 
     utterance.onend = () => {
       if (sessionRef.current !== sessionId) return;
@@ -455,6 +469,27 @@ export const useSpeechSynthesis = (text: string): UseSpeechSynthesisResult => {
       setIsSpeaking(false);
       if (event.error !== "interrupted") setError("Narration failed to play.");
     };
+  const setPitch = useCallback((nextPitch: number) => {
+    setPitchState(nextPitch);
+
+    if (utteranceRef.current) {
+      utteranceRef.current.pitch = nextPitch;
+    }
+  }, []);
+
+  const setVolume = useCallback((nextVolume: number) => {
+    setVolumeState(nextVolume);
+
+    if (utteranceRef.current) {
+      utteranceRef.current.volume = nextVolume;
+    }
+  }, []);
+
+  const pause = useCallback(() => {
+    if (synthRef.current && isSpeaking && !isPaused) {
+      synthRef.current.pause();
+    }
+  }, [isPaused, isSpeaking]);
 
     utteranceRef.current = utterance;
     speechSynthesis.speak(utterance);
