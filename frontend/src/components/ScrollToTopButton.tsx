@@ -23,8 +23,21 @@ const ScrollToTopButton = () => {
     <button
       onClick={scrollToTop}
       aria-label="Scroll to top"
-      style={{
-        position: "fixed",
+      className={`
+        fixed bottom-24 right-6
+        w-14 h-14 rounded-full
+        border-none cursor-pointer
+        bg-gradient-to-br from-blue-500 to-indigo-500
+        text-white text-xl
+        flex items-center justify-center
+        shadow-[0_4px_15px_rgba(59,130,246,0.4)]
+        transition-all duration-300 ease-in-out
+        z-[9999]
+        ${isVisible
+          ? "opacity-100 translate-y-0 pointer-events-auto"
+          : "opacity-0 translate-y-3 pointer-events-none"
+        }
+      `}
         bottom: "6rem",
         left: "6rem",
         width: "56px",
@@ -34,11 +47,11 @@ const ScrollToTopButton = () => {
         cursor: "pointer",
         background: "linear-gradient(135deg, #3b82f6, #6366f1)",
         color: "#ffffff",
-        fontSize: "1.25rem",
+        fontSize: "1rem",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxShadow: "0 4px 15px rgba(59, 130, 246, 0.4)",
+        boxShadow: "0 6px 18px rgba(59, 130, 246, 0.25)",
         opacity: isVisible ? 1 : 0,
         pointerEvents: isVisible ? "auto" : "none",
         transform: isVisible ? "translateY(0)" : "translateY(12px)",
@@ -46,7 +59,6 @@ const ScrollToTopButton = () => {
         zIndex: 9980,
       }}
     >
-      ↑
     </button>
   );
 };
