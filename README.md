@@ -159,8 +159,8 @@ After cloning, create your env files from the examples in the repo:
 git clone https://github.com/ronisarkarexe/story-spark-ai.git
 cd story-spark-ai
 
-# 2. Install all dependencies (npm workspaces — single install)
-npm install
+# 2. Install all dependencies (pnpm workspaces)
+pnpm install
 ```
 
 Copy the example env files and fill in your values:
