@@ -7,8 +7,6 @@ import {
   useRemoveStoryFromCollectionMutation,
   useUpdateCollectionMutation,
 } from "../../redux/apis/collection.api";
-import { getUserInfo } from "../../services/auth.service";
-
 interface Props {
   collection: Collection;
   isOwner: boolean;
